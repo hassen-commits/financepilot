@@ -55,7 +55,7 @@
   begin(){this.draft=null;return ++this.readToken;}
   accept(token,name,text){if(token!==this.readToken)return false;this.draft={name,...validate(text)};return true;}
   fail(token,message){if(token!==this.readToken)return false;this.draft={name:'',valid:false,errors:[{line:0,message}],records:[],preview:[]};return true;}
-  activate(){if(!this.draft?.valid)throw Error('Fichier techniquement invalide ou absent.');this.active=Object.freeze({name:this.draft.name,records:this.draft.records,version:++this.version});return this.active;}
+  activate(){if(!this.draft?.valid)throw Error('Fichier techniquement invalide ou absent.');this.active=Object.freeze({name:this.draft.name,records:this.draft.records,origin:this.draft.origin||null,version:++this.version});return this.active;}
   clear(){this.readToken++;this.draft=null;this.active=null;this.version++;}
  }
  const api={columns,divisions,rubrics,key,parseAmount,validate,Session};

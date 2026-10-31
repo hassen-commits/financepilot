@@ -1,4 +1,14 @@
-# FinancePilot — Prototype V2.3 locale
+# FinancePilot — Prototype V2.3.1 — recette validée
+
+## Import Excel expérimental
+
+Branche dédiée : `codex/v2.3.1-excel-import`, base `v2.3-recette-validee` inchangée. Les fichiers .xlsx alimentent uniquement les références V2.2, jamais les données de calcul du compte de résultat. Le CSV reste disponible.
+
+Dans Import : choisir le classeur fictif, une feuille, la structure long/large, les lignes et les colonnes, puis confirmer le mapping mensuel en euros. Contrôler le candidat avant activation temporaire explicite. Formules dans les champs importés, ambiguïtés non confirmées, erreurs et doublons empêchent l’activation ; la référence active antérieure est préservée.
+
+Ne pas utiliser de fichier professionnel. Exemples : `fixtures/excel/`. Guide détaillé : `RECETTE-V2.3.1.md` ; licences, provenance et versions : `THIRD_PARTY_NOTICES.md`. Les bibliothèques sont embarquées localement, sans CDN à l’exécution. Les limites et le protocole de recette navigateur y sont explicites.
+
+Tests : ajouter `excel.test.cjs` et `excel-ui.test.cjs` aux suites existantes. La recette fonctionnelle utilisateur est validée et clôturée : six vérifications navigateur conformes, rapprochement et validation globale conformes sur les références fictives. Voir RELEASE-V2.3.1.md. Aucun déploiement ni publication GitHub effectué.
 
 ## Analyse mensuelle V2.3
 

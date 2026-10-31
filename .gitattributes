@@ -1,0 +1,3 @@
+# Conserver les distributions originales et les classeurs de recette octet pour octet.
+vendor/** -text
+*.xlsx binary
