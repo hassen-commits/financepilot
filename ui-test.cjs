@@ -13,5 +13,5 @@ assert.match(element('#screen').innerHTML,/EBITDA hors produits immobilisés par
 element('#month').value='1';element('#division').value='6';element('#month').onchange();
 assert.match(element('#screen').innerHTML,/45\s*000/);
 for(const route of ['income','controls','import']){ctx.location.hash='#'+route;vm.runInContext('render()',ctx);assert.ok(element('#screen').innerHTML.length>100);}
-ctx.location.hash='#controls';vm.runInContext('render()',ctx);assert.match(element('#screen').innerHTML,/15\/15 contrôles conformes/);
+ctx.location.hash='#controls';vm.runInContext('render()',ctx);assert.match(element('#screen').innerHTML,/16\/16 contrôles conformes/);
 console.log('Rendu V2 : quatre routes, filtres, graphiques et contrôles vérifiés sans navigateur.');

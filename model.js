@@ -11,7 +11,9 @@
   const metrics=[...inputs,'ebitda','ebitdaExCapitalized'];
   const indicators={ebitda:{label:'EBITDA',reference:'H109/RESO/CRAG2/0EBITDA'},ebitdaExCapitalized:{label:'EBITDA hors produits immobilisés',reference:null},capitalizedACE:{label:'Production immobilisée ACE',reference:'H109/RESO/CRAG2/0PROACE'},capitalizedPayroll:{label:'Production immobilisée liée à la masse salariale',reference:'H109/RESO/CRAG2/0PROMASA'}};
   const cents=value=>Math.round(value*100);
+  const validSelection=(month,division,year)=>Number.isInteger(month)&&month>=1&&month<=12&&Number.isInteger(year)&&year>=1&&(division==='all'||divisions.includes(division));
   function total(month,division='all',cumulative=false,year=2026,source=data){
+    if(!validSelection(month,division,year))return Object.fromEntries(metrics.map(k=>[k,null]));
     const ds=division==='all'?divisions:[division];
     const ms=cumulative?Array.from({length:month},(_,i)=>i+1):[month];
     const rows=source.filter(r=>r.year===year&&ds.includes(r.division)&&ms.includes(r.month));
@@ -25,7 +27,11 @@
   function variation(current,previous){if(current===null||previous===null)return {amount:null,percent:null};return {amount:(cents(current)-cents(previous))/100,percent:previous===0?null:(current-previous)/Math.abs(previous)*100};}
   function controls(month,division='all',year=2026,source=data,calculate=total){
     const checks=[];
-    const add=(label,expected,actual)=>{const available=Number.isFinite(expected)&&Number.isFinite(actual);const gap=available?(cents(actual)-cents(expected))/100:null;checks.push({label,expected,actual,gap,status:!available?'Bloquant':gap===0?'Conforme':'Bloquant'});};
+    const add=(label,expected,actual,id=`C${String(checks.length+1).padStart(2,'0')}`)=>{const available=Number.isFinite(expected)&&Number.isFinite(actual);const gap=available?(cents(actual)-cents(expected))/100:null;checks.push({id,kind:'internal',label,expected,actual,gap,status:!available?'Bloquant':gap===0?'Conforme':'Bloquant'});};
+    if(!validSelection(month,division,year)){
+      add('Périmètre et paramètres de sélection',0,1,'C16');
+      return {checks,issues:['Sélection invalide : mois entier de 1 à 12, exercice entier positif et division connue requis.']};
+    }
     const c=calculate(month,division,false,year,source),y=calculate(month,division,true,year,source);
     const sum=values=>values.every(Number.isFinite)?values.reduce((s,v)=>s+cents(v),0)/100:null;
     const selected=division==='all'?divisions:[division];
@@ -37,6 +43,9 @@
       for(const cumulative of [false,true])add('Consolidation '+(cumulative?'cumulée':'mensuelle')+' · '+(indicators[k]?.label||k),sum(divisions.map(d=>calculate(month,d,cumulative,year,source)[k])),calculate(month,'all',cumulative,year,source)[k]);
     }
     for(const [label,t] of [['mensuelle',c],['cumulée',y]])add('Passage entre indicateurs · '+label,t.ebitda===null||t.capitalizedACE===null||t.capitalizedPayroll===null?null:(cents(t.ebitda)-cents(t.capitalizedACE)-cents(t.capitalizedPayroll))/100,t.ebitdaExCapitalized);
+    const unexpected=source.filter(r=>r.year===year&&(!Number.isInteger(r.month)||r.month<1||r.month>12||(r.month<=month&&!divisions.includes(r.division))));
+    add('Périmètre : divisions et périodes reconnues',0,unexpected.length,'C16');
+    unexpected.forEach(r=>issues.push(`Périmètre invalide : division ${String(r.division)}, mois ${String(r.month)}`));
     return {checks,issues};
   }
   function parseCSV(text){

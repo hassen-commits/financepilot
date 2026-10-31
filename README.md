@@ -1,4 +1,10 @@
-# FinancePilot — Prototype V2
+# FinancePilot — Prototype V2.1
+
+## Robustesse V2.1 locale
+
+Les 15 contrôles internes portent désormais les identifiants C01 à C15. C16 vérifie le périmètre et les paramètres. La sélection invalide produit un diagnostic Bloquant sans calcul ; les divisions inconnues ne passent plus silencieusement les contrôles. L’écran affiche les identifiants et distingue explicitement les contrôles internes des scénarios illustratifs.
+
+Exécuter `node --test robustness.test.cjs` : 23 tests de robustesse, avec anomalies ciblées, références fictives indépendantes et vérification de non-modification des données. Compléter par `node test.cjs` et `node ui-test.cjs`. Voir `RECETTE-V2.1.md` pour la matrice et les limites. Les références indépendantes sont des assertions de test, sans réconciliation avec une source professionnelle. Aucun déploiement V2.1 effectué.
 
 ## Évolutions V2
 
