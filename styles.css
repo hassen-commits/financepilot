@@ -8,3 +8,16 @@
  .filters select{min-width:0;min-height:44px}
  .card,.panel,.two-columns>*{min-width:0}
 }
+/* Référence indépendante V2.2 : étapes distinctes et tableaux au centime. */
+.reference-section{margin-top:24px}.reference-section h3{font-size:14px;margin-top:26px}
+.reference-section code{display:block;overflow-wrap:anywhere;font-size:12px;background:#f3f6f8;padding:12px;border-radius:6px}
+.reference-section p,.reference-section li{font-size:12px;line-height:1.7}
+.reference-filters{display:flex;flex-wrap:wrap;gap:14px;margin:20px 0}
+.reference-section .table-wrap{max-height:520px;overflow:auto;margin-top:16px}
+.reference-section th{position:sticky;top:0;z-index:1}
+.reference-section td:last-child{white-space:normal;min-width:180px}
+.reference-section button{margin-top:10px;min-height:44px}
+button:disabled{opacity:.5;cursor:not-allowed}.neutral{background:#edf1f5;color:#536479}
+@media(max-width:720px){.reference-filters{display:grid;grid-template-columns:minmax(0,1fr)}.reference-filters select{max-width:100%;min-width:0}.reference-section button{width:100%;margin-left:0}}
+.variance-section{margin-top:24px}.variance-section h3{font-size:15px;margin-top:28px}.variance-section>label{max-width:360px;margin:20px 0}.variance-cards{grid-template-columns:repeat(2,minmax(0,1fr));margin-top:20px}.variance-cards .value{font-size:25px}.variance-bar-row{display:grid;grid-template-columns:50px minmax(0,1fr) 120px;gap:12px;align-items:center;font-size:12px;margin:16px 0}.variance-axis{height:24px;position:relative;background:linear-gradient(to right,#f7f0f1 50%,#edf7f4 50%)}.variance-axis:after{content:'';position:absolute;left:50%;height:100%;border-left:1px solid #617586}.variance-bar{position:absolute;height:100%;background:#159b83}.variance-bar.negative{background:#b85265}.variance-bars{margin:24px 0}
+@media(max-width:720px){.variance-cards{grid-template-columns:minmax(0,1fr)}.variance-bar-row{grid-template-columns:35px minmax(0,1fr) 95px;gap:6px}.variance-section>label select{min-width:0;max-width:100%}}

@@ -1,4 +1,20 @@
-# FinancePilot — Prototype V2.1
+# FinancePilot — Prototype V2.3 locale
+
+## Analyse mensuelle V2.3
+
+Le bloc Analyse mensuelle du tableau de bord compare M à M−1 pour E et H. Il affiche les contributions signées des cinq divisions et des rubriques existantes, ainsi que des diagnostics internes V01/V02 de réconciliation au centime. Aucun poste ni cause économique n’est inventé. Une base nulle est distincte d’une donnée manquante. Les données, C01–C16 et le rapprochement V2.2 restent inchangés.
+
+Recette détaillée : `RECETTE-V2.3.md`. Tests supplémentaires : `node --test variance.test.cjs variance-ui.test.cjs`, à compléter par les suites V2.1/V2.2 et les scripts historiques. Aucun déploiement ou envoi GitHub effectué.
+
+## Rapprochement indépendant V2.2
+
+Dans Import ou Contrôles : choisir un CSV fictif de référence, vérifier le diagnostic technique, l’activer explicitement en mémoire, consulter les écarts financiers, puis valider le périmètre complet si tout est conforme. Le périmètre obligatoire inclut les cinq divisions et E/H/A/P, de janvier au mois de clôture choisi. Les filtres de détail ne réduisent pas la validation globale.
+
+CSV strict : `annee;mois;division;rubrique;montant_eur`, UTF-8, point-virgule, montants signés avec point et deux décimales maximum. Les montants manquants ne deviennent jamais zéro. Les écarts sont exprimés en centimes et les statuts sont Conforme, Bloquant ou Non contrôlé. Les écarts financiers n’empêchent pas l’activation d’un CSV techniquement valide ; ils interdisent la validation globale.
+
+Exemple indépendant écrit séparément : `fixtures/reference-fictive-janvier-fevrier.csv`. Choisir une clôture en février 2026 pour une recette complète de cet exemple. Il ne remplace pas les données de démonstration. Les références sont effacées au rechargement.
+
+Tests : `node --test robustness.test.cjs reconciliation.test.cjs reference-ui.test.cjs`, `node test.cjs`, `node ui-test.cjs`. Voir `RECETTE-V2.2.md` pour le contrat, les tests, les limites et la recette manuelle. Les données, le modèle et les 16 contrôles V2.1 sont préservés. Aucune connexion externe, publication GitHub ou mise à jour du site hébergé effectuée.
 
 ## Robustesse V2.1 locale
 
