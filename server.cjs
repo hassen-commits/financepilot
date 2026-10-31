@@ -1,0 +1,3 @@
+const http=require('node:http'),fs=require('node:fs'),path=require('node:path');
+const allowed={'/':'index.html','/index.html':'index.html','/styles.css':'styles.css','/model.js':'model.js','/script.js':'script.js'};
+http.createServer((req,res)=>{const file=allowed[req.url.split('?')[0]];if(!file){res.writeHead(404);return res.end('Introuvable');}res.setHeader('Content-Type',file.endsWith('.css')?'text/css; charset=utf-8':file.endsWith('.js')?'text/javascript; charset=utf-8':'text/html; charset=utf-8');res.setHeader('Cache-Control','no-store');fs.createReadStream(path.join(__dirname,file)).pipe(res);}).listen(4173,'127.0.0.1',()=>console.log('FinancePilot : http://127.0.0.1:4173'));
