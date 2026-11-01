@@ -1,4 +1,12 @@
-# FinancePilot — Prototype V2.3.1 — recette validée
+# FinancePilot — Prototype V2.4 — recette validée
+
+## Synthèse de gestion V2.4
+
+Le tableau de bord ajoute un commentaire mensuel déterministe et copiable, sans IA ni service externe. Il présente E et H, les trois principales divisions, les contributions par rubrique au seuil inclusif de 1 000 € (configurable dans la session), les contrôles internes, les rapprochements et la validation réellement effectuée. Il reste consolidé sur cinq divisions même si le tableau de bord filtre une division.
+
+Les contributions omises sont regroupées séparément en positif et négatif ; aucune cause économique n’est inventée. Toute erreur retire le commentaire précédent. Voir `RECETTE-V2.4.md` pour la recette utilisateur et les limites. Recette fonctionnelle V2.4 validée et clôturée le 1er novembre 2026 : 11 tests utilisateur conformes, aucun défaut bloquant, pour le prototype local fictif ; le tag V2.3.1 validé est conservé intact.
+
+Tests ajoutés : `node --test management-summary.test.cjs management-summary-ui.test.cjs`, à exécuter avec les 103 tests existants et les scripts historiques. Aucun déploiement ou envoi GitHub effectué.
 
 ## Import Excel expérimental
 

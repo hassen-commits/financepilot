@@ -9,7 +9,7 @@ function setup(scriptOverride){
   set innerHTML(html){this.children.forEach(c=>c.remove());this.children=[];this.html=html;this.parse(html);}
   get innerHTML(){return this.html;}
   parse(html){
-   for(const match of html.matchAll(/<(select|input|div|button)\b[^>]*\bid="([^"]+)"[^>]*>/g)){
+   for(const match of html.matchAll(/<(select|input|div|button|textarea)\b[^>]*\bid="([^"]+)"[^>]*>/g)){
     const el=new Element(match[2],this);this.children.push(el);
     if(match[1]==='select'){
      const body=html.slice(match.index+match[0].length).split('</select>')[0];
@@ -24,7 +24,7 @@ function setup(scriptOverride){
  for(const id of ['screen','page-title','subtitle','month','division','year'])new Element(id);
  nodes.get('#division').value='6';nodes.get('#year').value='2026';
  const ctx=vm.createContext({console,Intl,Option:function(){},location:{hash:'#dashboard'},document:{querySelector:s=>nodes.get(s)||null,querySelectorAll:()=>[]},window:{addEventListener(){}},setTimeout});
- for(const f of ['model.js','reference.js','reconciliation.js','reference-ui.js','variance.js','variance-ui.js'])vm.runInContext(fs.readFileSync(f,'utf8'),ctx);
+ for(const f of ['model.js','reference.js','reconciliation.js','reference-ui.js','variance.js','variance-ui.js','management-summary.js','management-summary-ui.js'])vm.runInContext(fs.readFileSync(f,'utf8'),ctx);
  ctx.FinanceModel=ctx.window.FinanceModel;vm.runInContext(scriptOverride||fs.readFileSync('script.js','utf8'),ctx);
  const change=(id,value)=>{const el=nodes.get(id);assert.ok(el,'Élément présent : '+id);el.value=value;assert.equal(typeof el.onchange,'function','Événement conservé : '+id);el.onchange({target:el});};
  change('#month','2');
@@ -34,6 +34,7 @@ function verify(u,indicator,value,previous,delta){
  const label=indicator==='ebitda'?'EBITDA':'EBITDA hors produits immobilisés';
  assert.equal(u.nodes.get('#graph-metric').value,indicator);
  assert.equal(u.nodes.get('#variance-indicator').value,indicator);
+ assert.match(u.nodes.get('#summary-text').value,new RegExp('Indicateur détaillé : '+(indicator==='ebitda'?'EBITDA E':'EBITDA hors produits immobilisés H')));
  const html=u.html(),v=u.variance();
  assert.ok(html.includes('<h2>'+label+' par division</h2>'));
  assert.ok(html.includes('<h2>Évolution · '+label+'</h2>'));

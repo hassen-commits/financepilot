@@ -2,6 +2,18 @@
  'use strict';
  const R=root.FinanceReference,Q=root.FinanceReconciliation;
  const session=new R.Session();
+ const subscribers=new Set();
+ const deepFreeze=value=>{if(value&&typeof value==='object'){Object.values(value).forEach(deepFreeze);Object.freeze(value);}return value;};
+ function notify(){for(const listener of subscribers){try{listener();}catch{root.clearFinanceSummary?.();}}}
+ root.FinanceReferenceView=Object.freeze({
+  subscribe:listener=>{subscribers.add(listener);return ()=>subscribers.delete(listener);},
+  snapshot:(year,month)=>{
+   const report=Q.report({active:session.active,year,closure:month,model:root.FinanceModel});
+   const validated=state.validated===`${session.version}/${year}/${month}`&&report.canValidate;
+   const parts=state.validated?.split('/');
+   return deepFreeze(JSON.parse(JSON.stringify({active:!!session.active,version:session.version,report,validated,validationScope:parts?{year:Number(parts[1]),month:Number(parts[2])}:null})));
+  }
+ });
  const state={year:2026,closure:9,month:'all',division:'all',rubric:'all',view:'all',validated:null};
  const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  const money=c=>c===null?'—':new Intl.NumberFormat('fr-FR',{style:'currency',currency:'EUR',minimumFractionDigits:2,maximumFractionDigits:2}).format(c/100);
@@ -21,13 +33,13 @@
   <section class="panel reference-section"><h2>3. Rapprochement financier indépendant</h2><p>Référence = montants de la référence active. Calculé = compte de résultat FinancePilot. Écart = calculé − référence, en centimes. Les références cumulées et consolidées sont des sommes de la référence, pas des totaux indépendants fournis séparément.</p><div class="reference-filters">${select('ref-year','Année de recette',years.map(y=>[y,y]),state.year)}${select('ref-closure','Mois de clôture',root.FinanceModel.months.concat(['Octobre','Novembre','Décembre']).map((m,i)=>[i+1,m]),state.closure)}</div><div class="notice">Périmètre obligatoire : année ${state.year}, janvier à mois ${state.closure}, cinq divisions, quatre rubriques E/H/A/P, soit ${report.required} références mensuelles. Les filtres de détail ci-dessous ne réduisent jamais ce périmètre. Le jeu FinancePilot ne couvre actuellement que janvier–septembre 2026.</div><div class="reference-filters">${select('ref-month','Mois affiché',[['all','Tous les mois'],...Array.from({length:state.closure},(_,i)=>[i+1,i+1])],state.month)}${select('ref-division','Division affichée',[['all','Toutes, avec consolidé'],...R.divisions.map(d=>[d,d]),['consolidated','Consolidé uniquement']],state.division)}${select('ref-rubric','Rubrique affichée',[['all','Toutes'],...R.rubrics.map(k=>[k,k])],state.rubric)}${select('ref-view','Vue',[['all','Mensuel et cumulé'],['monthly','Mensuel'],['ytd','Cumul janvier → clôture']],state.view)}</div><p>Libellés : E = EBITDA ; H = EBITDA hors produits immobilisés ; A = production immobilisée ACE ; P = production immobilisée liée à la masse salariale.</p><p>${filtered.length} résultats affichés. ${report.blocking} résultats bloquants dans le périmètre complet ; ${report.missingCount} références mensuelles obligatoires manquantes.</p>${table(['Année','Mois / période','Division','Rubrique','Référence €','Calculé €','Écart (centimes)','Statut','Motif'],filtered.map(r=>[r.year,r.cumulative?`Janvier → ${r.month}`:r.month,r.division==='all'?'Consolidé':r.division,r.rubric,money(r.reference),money(r.calculated),r.gap===null?'—':String(r.gap),badge(r.status),`${esc(r.reason)}${r.missing.length?`<details><summary>Clés manquantes</summary>${r.missing.map(esc).join('<br>')}</details>`:''}`]))}<h3>Cohérence financière de la référence</h3>${report.referenceIssues.length?table(['Année','Mois','Division','Statut','Motif'],report.referenceIssues.map(r=>[r.year,r.month,r.division,badge(r.status),esc(r.message)])):'<p>Aucune incohérence détectée sur les groupes complets. Les groupes incomplets restent Non contrôlés.</p>'}</section>
   <section class="panel reference-section"><h2>4. Validation globale du périmètre fictif</h2><p>Contrôles internes C01–C16 : ${report.internal.length} résultat(s) non conforme(s) sur les sélections obligatoires. Les rapprochements source / CRD sont distincts de ces contrôles internes.</p>${report.internal.length?`<details><summary>Diagnostics internes bloquants</summary>${table(['Mois','Division','Contrôle','Statut'],report.internal.map(r=>[r.month,r.division,r.id,badge(r.status)]))}</details>`:''}<p>${report.canValidate?'Périmètre complet et conforme : validation technique globale possible.':'Validation globale impossible : référence absente/incomplète, écart financier, référence incohérente ou contrôle interne bloquant.'}</p><button id="ref-validate" ${report.canValidate?'':'disabled'}>Valider le périmètre fictif</button><p id="ref-validation" aria-live="polite">${state.validated===validationKey()&&report.canValidate?'Périmètre fictif validé temporairement dans cet onglet. Aucune certification comptable.':'Périmètre non validé.'}</p></section>`;
   document.querySelector('#ref-file').onchange=e=>readFile(e.target.files[0]);
-  document.querySelector('#ref-activate').onclick=()=>{if(!session.draft?.valid)return;session.activate();root.resetFinanceExcel?.();state.validated=null;state.year=session.active.records[0].year;mount();};
-  document.querySelector('#ref-clear').onclick=()=>{session.clear();root.resetFinanceExcel?.();state.validated=null;state.year=2026;mount();};
+  document.querySelector('#ref-activate').onclick=()=>{if(!session.draft?.valid)return;session.activate();root.resetFinanceExcel?.();state.validated=null;state.year=session.active.records[0].year;mount();notify();};
+  document.querySelector('#ref-clear').onclick=()=>{session.clear();root.resetFinanceExcel?.();state.validated=null;state.year=2026;mount();notify();};
   for(const [id,field] of [['ref-year','year'],['ref-closure','closure'],['ref-month','month'],['ref-division','division'],['ref-rubric','rubric'],['ref-view','view']])document.querySelector('#'+id).onchange=e=>{
    state[field]=['year','closure'].includes(field)?Number(e.target.value):e.target.value;
-   if(field==='year'||field==='closure'){state.validated=null;state.month='all';}mount();
+   if(field==='year'||field==='closure'){state.validated=null;state.month='all';}mount();notify();
   };
-  document.querySelector('#ref-validate').onclick=()=>{if(getReport().canValidate){state.validated=validationKey();mount();}};
+  document.querySelector('#ref-validate').onclick=()=>{if(getReport().canValidate){state.validated=validationKey();mount();notify();}};
   if(root.mountFinanceExcel){host.insertAdjacentHTML('afterbegin','<div id="excel-import-panel"></div>');root.mountFinanceExcel({begin:()=>session.begin(),refresh:mount,accept:(token,name,candidate)=>{if(!candidate.valid)return false;const accepted=session.accept(token,name,candidate.csv);if(accepted)session.draft.origin=Object.freeze({format:'xlsx',sheet:candidate.sheet,config:candidate.config,provenance:candidate.provenance});return accepted;}});}
 
  }

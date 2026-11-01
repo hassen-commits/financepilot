@@ -5,7 +5,7 @@ const elements=new Map();
 function element(key){if(!elements.has(key))elements.set(key,{value:key==='#division'?'all':key==='#year'?'2026':'',innerHTML:'',textContent:'',insertAdjacentHTML(position,html){this.innerHTML+=html;},add(){}});return elements.get(key);}
 const ctx=vm.createContext({console,Intl,Number,Math,Set,Option:function(){},location:{hash:'#dashboard'},document:{querySelector:element,querySelectorAll:()=>[]},window:{addEventListener(){}},setTimeout});
 vm.runInContext(fs.readFileSync('model.js','utf8'),ctx);ctx.FinanceModel=ctx.window.FinanceModel;
-for(const file of ['reference.js','reconciliation.js','reference-ui.js','variance.js','variance-ui.js'])vm.runInContext(fs.readFileSync(file,'utf8'),ctx);
+for(const file of ['reference.js','reconciliation.js','reference-ui.js','variance.js','variance-ui.js','management-summary.js','management-summary-ui.js'])vm.runInContext(fs.readFileSync(file,'utf8'),ctx);
 vm.runInContext(fs.readFileSync('script.js','utf8'),ctx);
 assert.match(element('#screen').innerHTML,/882\s*000/);
 assert.match(element('#screen').innerHTML,/EBITDA hors produits immobilisés/);
